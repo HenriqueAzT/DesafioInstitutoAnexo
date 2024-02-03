@@ -39,9 +39,7 @@ O objetivo desta atividade foi criar um programa em Python que utiliza visão co
 
 Para executar o programa, é necessário ter o Python instalado, assim como as bibliotecas especificadas no código. A execução é feita a partir do terminal ou prompt de comando, digitando:
 
-bashCopy code
-
-`python nome_do_arquivo.py` 
+```python main.py``` 
 
 Substitua "nome_do_arquivo.py" pelo nome do arquivo que contém o código.
 
