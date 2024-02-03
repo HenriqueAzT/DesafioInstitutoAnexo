@@ -1,15 +1,16 @@
 import cv2
 import torch
 import time
+import os
+import tkinter as tk
+import csv
+
 from collections import deque
 from PIL import Image, ImageTk
-import tkinter as tk
 from threading import Thread
 from datetime import datetime
-import os
 from queue import Queue
 from reportlab.pdfgen import canvas
-import csv
 
 class App:
     def __init__(self, root, cap):
@@ -24,7 +25,7 @@ class App:
         self.personCounted = False
         self.visitorData = []
 
-        # Adicione um Canvas para exibir a imagem
+        # Adiciona um Canvas para exibir a imagem
         self.canvas = tk.Canvas(root)
         self.canvas.pack()
 
@@ -36,20 +37,20 @@ class App:
         self.closeButton = tk.Button(root, text="Fechar", command=self.onClosing)
         self.closeButton.pack()
 
-        # Use uma fila para passar os quadros entre threads
+        # Usa uma fila para passar os quadros entre threads
         self.frameQueue = Queue()
 
-        # Adicione uma variável de instância para armazenar a última imagem
+        # Adiciona uma variável de instância para armazenar a última imagem
         self.lastImage = None
 
-        # Adicione uma variável para controlar o tempo de exibição da mensagem de parabéns
+        # Adiciona uma variável para controlar o tempo de exibição da mensagem de parabéns
         self.messageDisplayTime = 0
 
-        # Adicione uma variável de sinalização para indicar que a thread deve parar
+        # Adiciona uma variável de sinalização para indicar que a thread deve parar
         self.threadRunning = True
 
-        # Adicione uma variável para o tempo de exibição da mensagem de parabéns
-        self.congratulationsDisplayTime = 5  # Altere conforme necessário, em segundos
+        # Adiciona uma variável para o tempo de exibição da mensagem de parabéns
+        self.congratulationsDisplayTime = 5  #segundos
 
         # Inicia a thread para a detecção de pessoas
         self.detectionThread = Thread(target=self.detectPeople)
@@ -62,7 +63,7 @@ class App:
         while self.threadRunning:
             ret, frame = self.cap.read()
 
-            # Redimensione a imagem antes da detecção
+            # Redimensiona a imagem antes da detecção
             frame = cv2.resize(frame, (640, 480))
 
             results = model(frame)
@@ -100,21 +101,21 @@ class App:
 
             frame = cv2.GaussianBlur(frame, (5, 5), 0)
 
-            # Adicione o quadro à fila para ser processado na GUI
+            # Adiciona o quadro à fila para ser processado na GUI
             self.frameQueue.put(frame)
 
     def updateImage(self):
-        # Verifique se há quadros na fila
+        # Verifica se há quadros na fila
         if not self.frameQueue.empty():
-            # Obtenha o quadro da fila
+            # Obtem o quadro da fila
             frame = self.frameQueue.get()
 
             if frame is not None:
-                # Atualize a variável de instância 'lastImage'
+                # Atualiza a variável de instância 'lastImage'
                 self.lastImage = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
                 if self.lastImage is not None:
-                    # Atualize a GUI na thread principal do Tkinter
+                    # Atualiza a GUI na thread principal do Tkinter
                     self.root.after(0, self.updateGui)
 
                     # Exibe a mensagem de parabéns se o tempo ainda não expirou
@@ -125,7 +126,7 @@ class App:
         self.root.after(10, self.updateImage)
 
     def updateGui(self):
-        # Atualize a imagem na GUI
+        # Atualiza a imagem na GUI
         img = Image.fromarray(self.lastImage)
         img = ImageTk.PhotoImage(img)
 
@@ -140,11 +141,10 @@ class App:
         self.canvas.create_text(40, 60, anchor=tk.NW, text="Parabéns, você ganhou o prêmio!", fill="red", font=("Arial", 20))
 
     def generatePdf(self, visitorData):
-        # Gere o PDF usando a biblioteca reportlab
+        # Gera o PDF
         pdfBaseFilename = "relatorio"
         pdfFilename = self.getUniqueFilename(pdfBaseFilename, "pdf")
 
-        # Abra explicitamente o arquivo PDF
         c = canvas.Canvas(pdfFilename)
 
         c.drawString(72, 800, "Relatório de Visitantes")
@@ -186,13 +186,13 @@ class App:
         self.generatePdf(self.visitorData)
 
     def onClosing(self):
-        # Indique à thread que ela deve parar
+        # Indica à thread que ela deve parar
         self.threadRunning = False
-        # Espere pela thread de detecção terminar
+        # Espera pela thread de detecção terminar
         self.detectionThread.join()
-        # Libere a câmera
+        # Libera a câmera
         self.cap.release()
-        # Destrua a janela principal
+        # Destroi a janela principal
         self.root.destroy()
 
 # Obtém o diretório do script
