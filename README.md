@@ -41,8 +41,6 @@ Para executar o programa, é necessário ter o Python instalado, assim como as b
 
 ```python main.py``` 
 
-Substitua "nome_do_arquivo.py" pelo nome do arquivo que contém o código.
-
 ## Considerações Finais
 
 O programa atingiu os objetivos propostos, proporcionando uma solução funcional para contagem de visitantes e geração de relatórios. A estrutura do código permite fácil compreensão e manutenção. Sugere-se a inclusão de mais funcionalidades, como ajuste dinâmico de parâmetros e melhoria na interface gráfica, para futuras versões.
